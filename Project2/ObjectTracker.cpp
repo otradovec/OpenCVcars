@@ -57,12 +57,46 @@ void ObjectTracker::track(cv::Mat cameraFrame)
 
 int ObjectTracker::getNumOfDownCars()
 {
-	return 0;
+	int result = 0;
+	for (Car car : cars)
+		if (car.isDirectionSet() && !car.goesUp())
+			result++;
+	return result;
 }
 
 void ObjectTracker::trackBB(std::vector<cv::Rect> boxes)
 {
 	updateBBs(boxes);
-	std::vector < cv::Rect> trueCurrentBoxes = getOverlapsFromCurrent();
+	std::vector < cv::Rect> trueCurrentBoxes = getOverlapingBBsWithPastBBs();
+	updateCars(trueCurrentBoxes);
 
+}
+
+void ObjectTracker::updateBBs(std::vector<cv::Rect> newBoxes)
+{
+	//delete subprev?
+	subpreviousBBs = previousBBs;
+	previousBBs = currentBBs;
+	currentBBs = newBoxes;
+}
+
+std::vector<cv::Rect> ObjectTracker::getOverlapingBBsWithPastBBs()
+{
+	return std::vector<cv::Rect>();
+}
+
+void ObjectTracker::updateCars(std::vector<cv::Rect> trueCurrentBoxes)
+{
+	for (Car car : cars) {
+		updateCar(car);
+	}
+	addNewCars(trueCurrentBoxes);
+}
+
+void ObjectTracker::updateCar(Car car)
+{
+}
+
+void ObjectTracker::addNewCars(std::vector<cv::Rect> trueCurrentBoxes)
+{
 }

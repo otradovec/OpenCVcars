@@ -23,5 +23,11 @@ public:
 	void track(cv::Mat frame);
 	int getNumOfDownCars();
 	void trackBB(std::vector < cv::Rect> boxes);
+private:
+	void updateBBs(std::vector < cv::Rect> newBoxes);
+	std::vector < cv::Rect> getOverlapingBBsWithPastBBs();
+	void updateCars(std::vector < cv::Rect> trueCurrentBoxes);
+	void updateCar(Car car);
+	void addNewCars(std::vector < cv::Rect> trueCurrentBoxes);
 };
 

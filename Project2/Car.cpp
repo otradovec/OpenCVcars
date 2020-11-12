@@ -1,5 +1,5 @@
 #include "Car.h"
-
+long Car::s_lastId = 0;
 Car::Car(cv::Rect bb)
 {
 	lastBB = bb;
