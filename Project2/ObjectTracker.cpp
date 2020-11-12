@@ -54,3 +54,15 @@ void ObjectTracker::track(cv::Mat cameraFrame)
 		drawPoints(cameraFrame, pointsToTrack, cv::Scalar(0, 255, 0));
 	}
 }
+
+int ObjectTracker::getNumOfDownCars()
+{
+	return 0;
+}
+
+void ObjectTracker::trackBB(std::vector<cv::Rect> boxes)
+{
+	updateBBs(boxes);
+	std::vector < cv::Rect> trueCurrentBoxes = getOverlapsFromCurrent();
+
+}

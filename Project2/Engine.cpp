@@ -33,13 +33,9 @@ void Engine::run()
 		cv::Point colorPosition = colorTracker.getColorPosition(cropped);
 		cv::circle(cropped, colorPosition, 15, cv::Scalar(122, 122, 122), -1);
 		*/
-		
-		objectTracker.track(cameraFrame);
-		
-		
-		
+		objectTracker.trackBB(obj);
 
-		std::string textString = std::string("Pionyrska: ") + "Lesnicka: " + "Bila: ";
+		std::string textString = std::string("Pionyrska: ") + std::to_string(objectTracker.getNumOfDownCars()) + " Lesnicka: " + "Bila: ";
 		cv::putText(cameraFrame,textString, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(118, 185, 0), 2);
 		cv::imshow("Camera stream", cameraFrame);
 		c = cv::waitKey(1);
