@@ -18,7 +18,8 @@ Engine::Engine()
 
 void Engine::run()
 {
-	for (;;) {
+	char c = cv::waitKey(1);
+	while(c != 27) {
 		captureCameraFrame();
 		captureCameraFrame();
 		captureCameraFrame();
@@ -53,13 +54,11 @@ void Engine::run()
 		std::string textString = std::string("Pionyrska: ") + "Lesnicka: " + "Bila: ";
 		cv::putText(cameraFrame,textString, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(118, 185, 0), 2);
 		cv::imshow("Camera stream", cameraFrame);
-		char c = cv::waitKey(1);
-		if (c == 27) {
-			break;
-		}
+		c = cv::waitKey(1);
 	}
 	videoCapture.release();
 	cv::destroyAllWindows();
+
 }
 
 void Engine::captureCameraFrame()
