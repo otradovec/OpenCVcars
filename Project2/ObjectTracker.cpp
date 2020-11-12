@@ -1,7 +1,5 @@
 #include "ObjectTracker.h"
 
-
-
 ObjectTracker::ObjectTracker()
 {
 }
@@ -39,5 +37,20 @@ void ObjectTracker::drawPoints(cv::Mat image, std::vector<cv::Point2f> points, c
 	{
 		cv::circle(image, points.at(i), 4, color,-1);
 
+	}
+}
+
+void ObjectTracker::track(cv::Mat cameraFrame)
+{
+	cameraFrame.copyTo(currentFrame);
+	if (pointsToTrack.size() == 0)
+	{
+		pointsToTrack = getExceptionalPoints(currentFrame);
+		cameraFrame.copyTo(previousFrame);
+	}
+	else {
+		pointsToTrack = trackObject(previousFrame, currentFrame, pointsToTrack);
+		cameraFrame.copyTo(previousFrame);
+		drawPoints(cameraFrame, pointsToTrack, cv::Scalar(0, 255, 0));
 	}
 }

@@ -27,25 +27,17 @@ void Engine::run()
 		float cropH = 0.6;
 		cv::Rect myROI(0, windowSize.height*cropH, windowSize.width, windowSize.height*(1-cropH));
 		cv::Mat cropped = cameraFrame(myROI);
-
+		std::vector<cv::Rect> obj = objectIsolator.getObjects(cropped);
+		drawBB(obj, cropped);
 		/*
 		cv::Point colorPosition = colorTracker.getColorPosition(cropped);
 		cv::circle(cropped, colorPosition, 15, cv::Scalar(122, 122, 122), -1);
 		*/
-		/*
-		cameraFrame.copyTo(currentFrame);
-		if (pointsToTrack.size()==0)
-		{
-			pointsToTrack = objectTracker.getExceptionalPoints(currentFrame);
-			cameraFrame.copyTo(previousFrame);
-		} else {
-			pointsToTrack = objectTracker.trackObject(previousFrame, currentFrame, pointsToTrack);
-			cameraFrame.copyTo(previousFrame);
-			objectTracker.drawPoints(cameraFrame, pointsToTrack, cv::Scalar(0, 255, 0));
-		}
-		*/
-		std::vector<cv::Rect> obj = objectIsolator.getObjects(cropped);
-		drawBB(obj,cropped);
+		
+		objectTracker.track(cameraFrame);
+		
+		
+		
 
 		std::string textString = std::string("Pionyrska: ") + "Lesnicka: " + "Bila: ";
 		cv::putText(cameraFrame,textString, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(118, 185, 0), 2);

@@ -10,6 +10,5 @@ private:
 public:
 	ObjectIsolator();
 	std::vector<cv::Rect> getObjects(cv::Mat image);
-
 };
 

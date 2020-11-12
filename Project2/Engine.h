@@ -20,9 +20,6 @@ private:
 	void drawBB(std::vector<cv::Rect> obj, cv::Mat image);
 	ColorTracker colorTracker;
 	ObjectTracker objectTracker;
-	cv::Mat currentFrame;
-	cv::Mat previousFrame;
-	std::vector<cv::Point2f> pointsToTrack;
 	ObjectIsolator objectIsolator;
 
 };
