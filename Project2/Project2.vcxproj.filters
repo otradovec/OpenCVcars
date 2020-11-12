@@ -30,9 +30,6 @@
     <ClCompile Include="ObjectIsolator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CarDetector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -45,9 +42,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectIsolator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CarDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

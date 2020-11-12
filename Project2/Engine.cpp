@@ -27,11 +27,7 @@ void Engine::run()
 		float cropH = 0.6;
 		cv::Rect myROI(0, windowSize.height*cropH, windowSize.width, windowSize.height*(1-cropH));
 		cv::Mat cropped = cameraFrame(myROI);
-		/*
-		std::vector<cv::Rect> cars = carDetector.getCars(cameraFrame);
-		for (int i = 0; i < cars.size(); i++) {
-			drawBB(cars.at(i));
-		}*/
+
 		/*
 		cv::Point colorPosition = colorTracker.getColorPosition(cropped);
 		cv::circle(cropped, colorPosition, 15, cv::Scalar(122, 122, 122), -1);
@@ -40,7 +36,7 @@ void Engine::run()
 		cameraFrame.copyTo(currentFrame);
 		if (pointsToTrack.size()==0)
 		{
-			pointsToTrack = objectTracker.getFeatures(currentFrame);
+			pointsToTrack = objectTracker.getExceptionalPoints(currentFrame);
 			cameraFrame.copyTo(previousFrame);
 		} else {
 			pointsToTrack = objectTracker.trackObject(previousFrame, currentFrame, pointsToTrack);
@@ -49,8 +45,8 @@ void Engine::run()
 		}
 		*/
 		std::vector<cv::Rect> obj = objectIsolator.getObjects(cropped);
-
 		drawBB(obj,cropped);
+
 		std::string textString = std::string("Pionyrska: ") + "Lesnicka: " + "Bila: ";
 		cv::putText(cameraFrame,textString, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(118, 185, 0), 2);
 		cv::imshow("Camera stream", cameraFrame);

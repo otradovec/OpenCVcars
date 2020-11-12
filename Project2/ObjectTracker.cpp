@@ -9,8 +9,8 @@ ObjectTracker::ObjectTracker()
 ObjectTracker::~ObjectTracker()
 {
 }
-///Identifies exceptional points
-std::vector<cv::Point2f> ObjectTracker::getFeatures(cv::Mat image)
+
+std::vector<cv::Point2f> ObjectTracker::getExceptionalPoints(cv::Mat image)
 {
 	std::vector<cv::Point2f> points;
 	cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);

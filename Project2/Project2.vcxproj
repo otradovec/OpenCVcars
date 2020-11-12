@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClCompile Include="ColorTracker.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="CarDetector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectIsolator.cpp" />
     <ClCompile Include="ObjectTracker.cpp" />
@@ -159,7 +158,6 @@
   <ItemGroup>
     <ClInclude Include="ColorTracker.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="CarDetector.h" />
     <ClInclude Include="ObjectIsolator.h" />
     <ClInclude Include="ObjectTracker.h" />
   </ItemGroup>
