@@ -8,10 +8,6 @@ ObjectIsolator::ObjectIsolator()
 }
 
 
-ObjectIsolator::~ObjectIsolator()
-{
-}
-
 std::vector<cv::Rect> ObjectIsolator::getObjects(cv::Mat image)
 {
 	backgroundSubtractor->apply(image, image);

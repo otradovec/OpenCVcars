@@ -9,7 +9,6 @@ private:
 	cv::Ptr<cv::BackgroundSubtractor> backgroundSubtractor;
 public:
 	ObjectIsolator();
-	~ObjectIsolator();
 	std::vector<cv::Rect> getObjects(cv::Mat image);
 
 };
