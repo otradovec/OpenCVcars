@@ -54,19 +54,6 @@ long Car::getId()
 	return m_id;
 }
 
-void Car::setProcessedColor(bool isColorSet)
-{
-	if (m_colorSetted)
-	{
-		throw "Color already processed";
-	}
-	else
-	{
-		m_colorSetted = isColorSet;
-	}
-	
-}
-
 void Car::setWhite(bool isWhite)
 {
 	if (m_colorSetted)
@@ -74,14 +61,7 @@ void Car::setWhite(bool isWhite)
 		throw "Setting color that was already processed";
 	}
 	m_isWhite = isWhite;
-}
-
-void Car::setProcessedDirection(bool isDirectionSet)
-{
-	if (m_directionSet) {
-		throw "Already processed setted for a second time";
-	}
-	m_directionSet = isDirectionSet;
+	m_colorSetted = true;
 }
 
 void Car::setGoesUp(bool goesUp)
@@ -90,6 +70,7 @@ void Car::setGoesUp(bool goesUp)
 		throw "Setting direction, but was already setted.";
 	}
 	m_goesUp = goesUp;
+	m_directionSet = true;
 }
 
 void Car::setExited(bool exited)
