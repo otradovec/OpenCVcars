@@ -2,10 +2,14 @@
 
 ObjectTracker::ObjectTracker()
 {
+	currentBBs = std::vector<cv::Rect>();
+	previousBBs = std::vector<cv::Rect>();
+	subpreviousBBs = std::vector<cv::Rect>();
 }
 
 ObjectTracker::~ObjectTracker()
 {
+	for (Car* car : cars) { delete car; }
 }
 
 std::vector<cv::Point2f> ObjectTracker::getExceptionalPoints(cv::Mat image)
@@ -58,8 +62,8 @@ void ObjectTracker::track(cv::Mat cameraFrame)
 int ObjectTracker::getNumOfDownCars()
 {
 	int result = 0;
-	for (Car car : cars)
-		if (car.isDirectionSet() && !car.goesUp())
+	for (Car* car : cars)
+		if (car->isDirectionSet() && !car->goesUp())
 			result++;
 	return result;
 }
@@ -67,36 +71,158 @@ int ObjectTracker::getNumOfDownCars()
 void ObjectTracker::trackBB(std::vector<cv::Rect> boxes)
 {
 	updateBBs(boxes);
-	std::vector < cv::Rect> trueCurrentBoxes = getOverlapingBBsWithPastBBs();
-	updateCars(trueCurrentBoxes);
-
+	updateCars();
 }
 
 void ObjectTracker::updateBBs(std::vector<cv::Rect> newBoxes)
 {
-	//delete subprev?
 	subpreviousBBs = previousBBs;
 	previousBBs = currentBBs;
 	currentBBs = newBoxes;
 }
 
-std::vector<cv::Rect> ObjectTracker::getOverlapingBBsWithPastBBs()
+void ObjectTracker::updateCars()
 {
-	return std::vector<cv::Rect>();
-}
-
-void ObjectTracker::updateCars(std::vector<cv::Rect> trueCurrentBoxes)
-{
-	for (Car car : cars) {
+	for (Car* car : cars) {
 		updateCar(car);
 	}
-	addNewCars(trueCurrentBoxes);
+	addNewCars();
 }
 
-void ObjectTracker::updateCar(Car car)
+void ObjectTracker::updateCar(Car* car)
 {
+	if (!car->exited())
+	{
+		if (!present(car,currentBBs) && !present(car, previousBBs))
+		{
+			car->setExited(true);
+			std::cout << " Exited car: " + std::to_string(car->getId());
+		}
+		else
+		{
+			//if(present(car, currentBBs)) updateBB(car);
+			updateBB(car);
+			std::cout << " New bb: " + std::to_string(car->getBB().area());
+			//updateColor(car);
+			//updateDirection(car);
+		}
+	}
 }
 
-void ObjectTracker::addNewCars(std::vector<cv::Rect> trueCurrentBoxes)
+void ObjectTracker::addNewCars()
 {
+	std::vector<cv::Rect> bbs = getCurrentBBsNotOverlappingWithAnyCar();
+	addCars(bbs);
+}
+
+std::vector<cv::Rect> ObjectTracker::getCurrentBBsNotOverlappingWithAnyCar()
+{
+	std::vector<cv::Rect> result;
+	for (cv::Rect currentBox : currentBBs) {
+		if (!isOverlapping(currentBox, getBBsOfActiveCars())) result.push_back(currentBox);
+	}
+	return result;
+}
+
+bool ObjectTracker::isOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
+{
+	for (cv::Rect rect : bbs) {
+		if (isOverlapping(rect, bb)) return true;
+	}
+	return false;
+}
+
+bool ObjectTracker::isOverlapping(cv::Rect first, cv::Rect second)
+{
+	return (first & second).area() > 0;
+}
+
+std::vector<cv::Rect> ObjectTracker::getBBsOfActiveCars()
+{
+	std::vector<cv::Rect> result = std::vector<cv::Rect>();
+	for (Car* car : cars) {
+		if (!car->exited())
+		{
+			result.push_back(car->getBB());
+		}
+	}
+	return result;
+}
+
+bool ObjectTracker::present(Car* car, std::vector<cv::Rect> bbs)
+{
+	cv::Rect carsBB = car->getBB();
+	for (cv::Rect rect : bbs) {
+		if (equalsBBs(carsBB,rect))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void ObjectTracker::updateBB(Car* car)
+{
+	std::cout << " Updating car: " + std::to_string( car->getId());
+	std::cout << "Before BB car: " + std::to_string(car->getBB().area());
+	cv::Rect newBB = getBBClosestOverlapping(car->getBB(), currentBBs);
+	if (newBB.area() > 1) {
+		car->setBB(newBB);
+	}
+	std::cout << "After BB car: " + std::to_string(car->getBB().area());
+}
+
+void ObjectTracker::addCars(std::vector<cv::Rect> bbs)
+{
+	for (cv::Rect box : bbs) {
+		cars.push_back(new Car(box));
+	}
+}
+
+cv::Rect ObjectTracker::getBBClosestOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
+{
+	std::vector<cv::Rect> over = getOverlapping(bb, bbs);
+	std::cout << " Num of overlapping: " +std::to_string( over.size());
+	return getClosest(bb,over);
+}
+
+std::vector<cv::Rect> ObjectTracker::getOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
+{
+	std::vector<cv::Rect> result;
+	for (cv::Rect box : bbs) {
+		if (isOverlapping(bb,box)) result.push_back(box);
+	}
+	return result;
+}
+
+cv::Rect ObjectTracker::getClosest(cv::Rect mainBB, std::vector<cv::Rect> bbs)
+{
+	cv::Rect closest;
+	long smallestDistance = LONG_MAX;
+	cv::Point mainBBCenter = getCenter(mainBB);
+	cv::Point otherBBCenter;
+	for (cv::Rect box : bbs) {
+		otherBBCenter = getCenter(box);
+		if (getDistance(mainBBCenter, otherBBCenter) < smallestDistance) {
+			smallestDistance = getDistance(mainBBCenter, otherBBCenter);
+			closest = box;
+		}
+	}
+	return closest;
+}
+
+bool ObjectTracker::equalsBBs(cv::Rect first, cv::Rect second)
+{
+	return (first.area() == second.area()) && (first.x == second.x);
+}
+
+cv::Point ObjectTracker::getCenter(cv::Rect rect)
+{
+	return cv::Point((rect.x + rect.width) / 2, (rect.y + rect.height) / 2);
+}
+
+long ObjectTracker::getDistance(cv::Point first, cv::Point second)
+{
+	cv::Point diff = first - second;
+	return cv::sqrt(diff.x*diff.x + diff.y*diff.y);
 }

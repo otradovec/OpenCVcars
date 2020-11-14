@@ -13,7 +13,7 @@ private:
 	std::vector<cv::Rect> subpreviousBBs;
 	std::vector<cv::Rect> previousBBs;
 	std::vector<cv::Rect> currentBBs;
-	std::vector<Car> cars;
+	std::vector<Car*> cars;
 public:
 	ObjectTracker();
 	~ObjectTracker();
@@ -23,11 +23,23 @@ public:
 	void track(cv::Mat frame);
 	int getNumOfDownCars();
 	void trackBB(std::vector < cv::Rect> boxes);
+	std::vector<cv::Rect> getBBsOfActiveCars();
 private:
 	void updateBBs(std::vector < cv::Rect> newBoxes);
-	std::vector < cv::Rect> getOverlapingBBsWithPastBBs();
-	void updateCars(std::vector < cv::Rect> trueCurrentBoxes);
-	void updateCar(Car car);
-	void addNewCars(std::vector < cv::Rect> trueCurrentBoxes);
+	void updateCars();
+	void updateCar(Car* car);
+	void addNewCars();
+	std::vector<cv::Rect> getCurrentBBsNotOverlappingWithAnyCar();
+	bool isOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs);
+	bool isOverlapping(cv::Rect first, cv::Rect second);
+	bool present(Car* car, std::vector<cv::Rect> currentBBs);
+	void updateBB(Car* car);
+	void addCars(std::vector<cv::Rect> bbs);
+	cv::Rect getBBClosestOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs);
+	std::vector<cv::Rect> getOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs);
+	cv::Rect getClosest(cv::Rect bb, std::vector<cv::Rect> bbs);
+	bool equalsBBs(cv::Rect first, cv::Rect second);
+	cv::Point getCenter(cv::Rect rect);
+	long getDistance(cv::Point first,cv::Point second);
 };
 

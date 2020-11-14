@@ -2,7 +2,7 @@
 long Car::s_lastId = 0;
 Car::Car(cv::Rect bb)
 {
-	lastBB = bb;
+	m_lastBB = bb;
 	s_lastId = s_lastId + 1;
 	m_id = s_lastId;
 	m_colorSetted = false;
@@ -10,10 +10,16 @@ Car::Car(cv::Rect bb)
 	m_directionSet = false;
 	m_goesUp = false;
 	m_exited = false;
+	std::cout << "Created car id: " + m_id;
 }
 
 Car::~Car()
 {
+}
+
+cv::Rect Car::getBB()
+{
+	return m_lastBB;
 }
 
 bool Car::isColorSet()
@@ -54,6 +60,12 @@ long Car::getId()
 	return m_id;
 }
 
+void Car::setBB(cv::Rect lastBB)
+{
+	if (lastBB.area() < 1) throw "Setting bb without area";
+	m_lastBB = lastBB;
+}
+
 void Car::setWhite(bool isWhite)
 {
 	if (m_colorSetted)
@@ -75,5 +87,6 @@ void Car::setGoesUp(bool goesUp)
 
 void Car::setExited(bool exited)
 {
+	if (m_exited && !exited) throw "Car comeback";
 	m_exited = exited;
 }
