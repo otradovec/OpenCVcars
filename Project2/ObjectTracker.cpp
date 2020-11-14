@@ -59,13 +59,22 @@ void ObjectTracker::track(cv::Mat cameraFrame)
 	}
 }
 
-int ObjectTracker::getNumOfDownCars()
+int ObjectTracker::getCarsGoingUp()
 {
-	int result = 0;
-	for (Car* car : cars)
-		if (car->isDirectionSet() && !car->goesUp())
-			result++;
-	return result;
+	int carsGoingUp = 0;
+	for (Car* car : cars) {
+		if (car->isDirectionSet() && car->goesUp()) carsGoingUp++;
+	}
+	return carsGoingUp;
+}
+
+int ObjectTracker::getCarsGoingDown()
+{
+	int carsGoingDown = 0;
+	for (Car* car : cars) {
+		if (car->isDirectionSet() && !car->goesUp()) carsGoingDown++;
+	}
+	return carsGoingDown;
 }
 
 void ObjectTracker::trackBB(std::vector<cv::Rect> boxes)
@@ -100,12 +109,25 @@ void ObjectTracker::updateCar(Car* car)
 		}
 		else
 		{
-			//if(present(car, currentBBs)) updateBB(car);
 			updateBB(car);
 			//updateColor(car);
-			//updateDirection(car);
+			updateDirection(car);
 		}
 	}
+}
+
+void ObjectTracker::updateDirection(Car * car)
+{
+	if (!car->isDirectionSet()) {
+		cv::Rect previousBB = getBBClosestOverlapping(car->getBB(), previousBBs);
+		if (present(car,currentBBs) && previousBB.area()>0)
+			car->setGoesUp(isGoingUp(car->getBB(),previousBB));
+	}
+}
+
+bool ObjectTracker::isGoingUp(cv::Rect currentBB, cv::Rect previousBB)
+{
+	return (getCenter(currentBB).y - getCenter(previousBB).y) < 0;
 }
 
 void ObjectTracker::addNewCars()

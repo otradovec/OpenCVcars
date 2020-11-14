@@ -5,8 +5,6 @@
 class ObjectTracker
 {
 private:
-	int upCarsOutOfSight;
-	int downCarsOutOfSight;
 	cv::Mat currentFrame;
 	cv::Mat previousFrame;
 	std::vector<cv::Point2f> pointsToTrack;
@@ -21,13 +19,16 @@ public:
 	std::vector<cv::Point2f> trackObject(cv::Mat oldImage, cv::Mat currentImage, std::vector<cv::Point2f> oldPoints);
 	void drawPoints(cv::Mat image, std::vector<cv::Point2f> points, cv::Scalar color);
 	void track(cv::Mat frame);
-	int getNumOfDownCars();
+	int getCarsGoingUp();
+	int getCarsGoingDown();
 	void trackBB(std::vector < cv::Rect> boxes);
 	std::vector<cv::Rect> getBBsOfActiveCars();
 private:
 	void updateBBs(std::vector < cv::Rect> newBoxes);
 	void updateCars();
 	void updateCar(Car* car);
+	void updateDirection(Car* car);
+	bool isGoingUp(cv::Rect currentBB, cv::Rect previousBB);
 	void addNewCars();
 	std::vector<cv::Rect> getCurrentBBsNotOverlappingWithAnyCar();
 	bool isOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs);
