@@ -96,13 +96,12 @@ void ObjectTracker::updateCar(Car* car)
 		if (!present(car,currentBBs) && !present(car, previousBBs))
 		{
 			car->setExited(true);
-			std::cout << " Exited car: " + std::to_string(car->getId());
+			std::cout << " Exited car: " + std::to_string(car->getId()) << std::endl;
 		}
 		else
 		{
 			//if(present(car, currentBBs)) updateBB(car);
 			updateBB(car);
-			std::cout << " New bb: " + std::to_string(car->getBB().area());
 			//updateColor(car);
 			//updateDirection(car);
 		}
@@ -163,13 +162,11 @@ bool ObjectTracker::present(Car* car, std::vector<cv::Rect> bbs)
 
 void ObjectTracker::updateBB(Car* car)
 {
-	std::cout << " Updating car: " + std::to_string( car->getId());
-	std::cout << "Before BB car: " + std::to_string(car->getBB().area());
+	std::cout << " Updating car: " + std::to_string( car->getId()) << std::endl;
 	cv::Rect newBB = getBBClosestOverlapping(car->getBB(), currentBBs);
 	if (newBB.area() > 1) {
 		car->setBB(newBB);
 	}
-	std::cout << "After BB car: " + std::to_string(car->getBB().area());
 }
 
 void ObjectTracker::addCars(std::vector<cv::Rect> bbs)
@@ -182,7 +179,6 @@ void ObjectTracker::addCars(std::vector<cv::Rect> bbs)
 cv::Rect ObjectTracker::getBBClosestOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
 {
 	std::vector<cv::Rect> over = getOverlapping(bb, bbs);
-	std::cout << " Num of overlapping: " +std::to_string( over.size());
 	return getClosest(bb,over);
 }
 

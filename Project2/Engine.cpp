@@ -53,8 +53,14 @@ void Engine::run()
 void Engine::captureCameraFrame()
 {
 	videoCapture >> cameraFrame;
-	cv::flip(cameraFrame, cameraFrame, 1);
-	cv::resize(cameraFrame, cameraFrame, windowSize);
+	if (!cameraFrame.empty())
+	{
+		cv::flip(cameraFrame, cameraFrame, 1);
+		cv::resize(cameraFrame, cameraFrame, windowSize);
+	}
+	else {
+		std::cout << std::endl << "End of video." << std::endl ;
+	}
 }
 
 void Engine::drawBB(cv::Rect rect,cv::Mat image)
