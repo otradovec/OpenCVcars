@@ -1,10 +1,7 @@
 #include "Engine.h"
 
-//Celkovy pocet auta, ktere projeli smerem k?ulici Pionyrska.
-//Celkovy pocet auta, ktere projeli smerem k?ulici Lesnicka
 //Celkovy pocet bilych aut.
 //Prumerna rychlost automobilu.
-//Ve chvili, kdy je dopravni prostredek rozeznam zobrazi se kolem nej ramecek
 
 Engine::Engine()
 {
