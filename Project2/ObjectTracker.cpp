@@ -109,8 +109,9 @@ void ObjectTracker::updateColor(Car * car, FrameHistory* frameHistory)
 		cv::Mat current = frameHistory->getCurrent();
 		if (current.empty()) throw new std::runtime_error("Empty image");
 		cv::Mat imageCut = getImageCut(car->getBB(), current);
+		car->print();
 		car->setWhite(colorTracker->isWhiteCar(imageCut));
-		std::cout << "Car id: " + std::to_string(car->getId()) << " Is white: " + std::to_string(car->isWhite());
+		car->print();
 	}
 }
 

@@ -90,3 +90,11 @@ void Car::setExited(bool exited)
 	if (m_exited && !exited) throw std::logic_error("Car comeback");
 	m_exited = exited;
 }
+
+void Car::print()
+{
+	cout << "Car id: " + to_string(this->m_id)
+		+ ", isDirectionSet: " + to_string(this->m_directionSet) + ", goes up: " + to_string(this->m_goesUp)
+		+ ", is color set: " + to_string(this->m_colorSetted) + ", is white: " + to_string(this->m_isWhite)
+		+ "BB top left: " + to_string(this->m_lastBB.x) << std::endl;
+}

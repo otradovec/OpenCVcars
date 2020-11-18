@@ -65,8 +65,9 @@ cv::Point ColorTracker::getColorPosition(cv::Mat image)
 bool ColorTracker::isWhiteCar(cv::Mat cut)
 {
 	cv::Mat preprocessedImage = preprocessImage(cut);
-	std::cout << "Area size: " + std::to_string(getGreatestArea(preprocessedImage));
-	return getGreatestArea(preprocessedImage) > 800;
+	double greatestArea = getGreatestArea(preprocessedImage);
+	std::cout << "Area size: " + std::to_string(greatestArea) << std::endl;
+	return greatestArea > 800;
 }
 
 double ColorTracker::getGreatestArea(cv::Mat blackAndWhiteImage)

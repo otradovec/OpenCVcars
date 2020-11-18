@@ -1,6 +1,9 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 
+using std::cout;
+using std::to_string;
+
 class Car
 {
 private:
@@ -26,6 +29,6 @@ public:
 	void setWhite(bool isWhite);
 	void setGoesUp(bool goesUp);
 	void setExited(bool exited);
-
+	void print();
 };
 
