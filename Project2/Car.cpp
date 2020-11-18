@@ -10,7 +10,7 @@ Car::Car(cv::Rect bb)
 	m_directionSet = false;
 	m_goesUp = false;
 	m_exited = false;
-	std::cout << std::endl << "Created car id: " + m_id;
+	std::cout << std::endl << " Created car id: " + std::to_string(m_id);
 }
 
 Car::~Car()
