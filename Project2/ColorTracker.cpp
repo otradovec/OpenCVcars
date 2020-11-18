@@ -10,17 +10,13 @@ ColorTracker::~ColorTracker()
 
 cv::Mat ColorTracker::preprocessImage(cv::Mat image)
 {
-	cv::Mat preprocessedImage;
-	//image.copyTo(preprocessedImage);
 	cv::Mat hsvImage;
 	cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV);
-	cv::imshow("HSV", hsvImage);
-	//hsvImage.copyTo(preprocessedImage);
 	int hMax = 360 / 2;
 	int vMax = 255;
 	int sensitivity = 15;
+	cv::Mat preprocessedImage;
 	cv::inRange(hsvImage, cv::Scalar(0, 0,vMax-sensitivity), cv::Scalar(hMax, vMax,vMax), preprocessedImage);
-	cv::imshow("In range", preprocessedImage);
 	///Operation open
 	cv::erode(preprocessedImage, preprocessedImage, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2, 2)));
 	cv::dilate(preprocessedImage, preprocessedImage, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
@@ -58,7 +54,6 @@ cv::Point ColorTracker::getColorPosition(cv::Mat image)
 		position = cv::Point((2*boundingBox.x + boundingBox.width) / 2, (2*boundingBox.y + boundingBox.height) / 2);
 	}
 	cv::drawContours(image, contours, -1, (0, 255, 0), 3);
-
 	return position;
 }
 
@@ -66,7 +61,7 @@ bool ColorTracker::isWhiteCar(cv::Mat cut)
 {
 	cv::Mat preprocessedImage = preprocessImage(cut);
 	double greatestArea = getGreatestArea(preprocessedImage);
-	std::cout << "Area size: " + std::to_string(greatestArea) << std::endl;
+	std::cout << "White area size: " + std::to_string(greatestArea) << std::endl;
 	return greatestArea > 800;
 }
 
