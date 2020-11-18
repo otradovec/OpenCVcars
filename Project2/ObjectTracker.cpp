@@ -5,11 +5,13 @@ ObjectTracker::ObjectTracker()
 	currentBBs = std::vector<cv::Rect>();
 	previousBBs = std::vector<cv::Rect>();
 	subpreviousBBs = std::vector<cv::Rect>();
+	colorTracker = new ColorTracker();
 }
 
 ObjectTracker::~ObjectTracker()
 {
 	for (Car* car : cars) { delete car; }
+	delete colorTracker;
 }
 
 std::vector<cv::Point2f> ObjectTracker::getExceptionalPoints(cv::Mat image)
@@ -40,22 +42,6 @@ void ObjectTracker::drawPoints(cv::Mat image, std::vector<cv::Point2f> points, c
 	for (int i = 0; i < points.size();	 i++)
 	{
 		cv::circle(image, points.at(i), 4, color,-1);
-
-	}
-}
-
-void ObjectTracker::track(cv::Mat cameraFrame)
-{
-	cameraFrame.copyTo(currentFrame);
-	if (pointsToTrack.size() == 0)
-	{
-		pointsToTrack = getExceptionalPoints(currentFrame);
-		cameraFrame.copyTo(previousFrame);
-	}
-	else {
-		pointsToTrack = trackObject(previousFrame, currentFrame, pointsToTrack);
-		cameraFrame.copyTo(previousFrame);
-		drawPoints(cameraFrame, pointsToTrack, cv::Scalar(0, 255, 0));
 	}
 }
 
@@ -77,10 +63,10 @@ int ObjectTracker::getCarsGoingDown()
 	return carsGoingDown;
 }
 
-void ObjectTracker::trackBB(std::vector<cv::Rect> boxes)
+void ObjectTracker::trackBB(std::vector<cv::Rect> boxes, FrameHistory* frameHistory)
 {
 	updateBBs(boxes);
-	updateCars();
+	updateCars(frameHistory);
 }
 
 void ObjectTracker::updateBBs(std::vector<cv::Rect> newBoxes)
@@ -90,15 +76,15 @@ void ObjectTracker::updateBBs(std::vector<cv::Rect> newBoxes)
 	currentBBs = newBoxes;
 }
 
-void ObjectTracker::updateCars()
+void ObjectTracker::updateCars(FrameHistory* frameHistory)
 {
 	for (Car* car : cars) {
-		updateCar(car);
+		updateCar(car,frameHistory);
 	}
 	addNewCars();
 }
 
-void ObjectTracker::updateCar(Car* car)
+void ObjectTracker::updateCar(Car* car, FrameHistory* frameHistory)
 {
 	if (!car->exited())
 	{
@@ -110,10 +96,29 @@ void ObjectTracker::updateCar(Car* car)
 		else
 		{
 			updateBB(car);
-			//updateColor(car);
+			updateColor(car,frameHistory);
 			updateDirection(car);
+			//updateSpeed(car);
 		}
 	}
+}
+
+void ObjectTracker::updateColor(Car * car, FrameHistory* frameHistory)
+{
+	if (!car->isColorSet()) {
+		cv::Mat current = frameHistory->getCurrent();
+		if (current.empty()) throw new std::runtime_error("Empty image");
+		cv::Mat imageCut = getImageCut(car->getBB(), current);
+		car->setWhite(colorTracker->isWhiteCar(imageCut));
+		std::cout << "Car id: " + std::to_string(car->getId()) << " Is white: " + std::to_string(car->isWhite());
+	}
+}
+
+cv::Mat ObjectTracker::getImageCut(cv::Rect box, cv::Mat originalImage)
+{
+	if (box.area()<1) throw "Seems bad box";
+	if (originalImage.empty()) throw "Empty image input";
+	return originalImage(box);
 }
 
 void ObjectTracker::updateDirection(Car * car)
@@ -185,7 +190,7 @@ bool ObjectTracker::present(Car* car, std::vector<cv::Rect> bbs)
 void ObjectTracker::updateBB(Car* car)
 {
 	std::cout << " Updating car: " + std::to_string( car->getId()) << std::endl;
-	cv::Rect newBB = getBBClosestOverlapping(car->getBB(), currentBBs);
+	cv::Rect newBB = getBBbestOverlapping(car, currentBBs);
 	if (newBB.area() > 1) {
 		car->setBB(newBB);
 	}
@@ -201,7 +206,7 @@ void ObjectTracker::addCars(std::vector<cv::Rect> bbs)
 cv::Rect ObjectTracker::getBBClosestOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
 {
 	std::vector<cv::Rect> over = getOverlapping(bb, bbs);
-	return getClosest(bb,over);
+	return getClosest(bb,over,DistanceTypes::Normal);
 }
 
 std::vector<cv::Rect> ObjectTracker::getOverlapping(cv::Rect bb, std::vector<cv::Rect> bbs)
@@ -213,16 +218,29 @@ std::vector<cv::Rect> ObjectTracker::getOverlapping(cv::Rect bb, std::vector<cv:
 	return result;
 }
 
-cv::Rect ObjectTracker::getClosest(cv::Rect mainBB, std::vector<cv::Rect> bbs)
+cv::Rect ObjectTracker::getClosest(cv::Rect mainBB, std::vector<cv::Rect> bbs, DistanceTypes distanceType)
 {
 	cv::Rect closest;
-	long smallestDistance = LONG_MAX;
+	double smallestDistance = DBL_MAX;
 	cv::Point mainBBCenter = getCenter(mainBB);
 	cv::Point otherBBCenter;
 	for (cv::Rect box : bbs) {
 		otherBBCenter = getCenter(box);
-		if (getDistance(mainBBCenter, otherBBCenter) < smallestDistance) {
-			smallestDistance = getDistance(mainBBCenter, otherBBCenter);
+		double idistance = getDistance(mainBBCenter, otherBBCenter);
+		if (distanceType = DistanceTypes::FavouringUp) {
+			if (mainBBCenter.y - otherBBCenter.y > 0)
+				idistance = 0.5*idistance;
+			else
+				idistance = 2 * idistance;
+		}
+		if (distanceType = DistanceTypes::FavouringDown) {
+			if (mainBBCenter.y - otherBBCenter.y < 0)
+				idistance = 0.5*idistance;
+			else
+				idistance = 2 * idistance;
+		}
+		if (idistance < smallestDistance) {
+			smallestDistance = idistance;
 			closest = box;
 		}
 	}
@@ -239,8 +257,51 @@ cv::Point ObjectTracker::getCenter(cv::Rect rect)
 	return cv::Point((rect.x + rect.width) / 2, (rect.y + rect.height) / 2);
 }
 
-long ObjectTracker::getDistance(cv::Point first, cv::Point second)
+double ObjectTracker::getDistance(cv::Point first, cv::Point second)
 {
 	cv::Point diff = first - second;
 	return cv::sqrt(diff.x*diff.x + diff.y*diff.y);
+}
+
+cv::Rect ObjectTracker::getBBbestOverlapping(Car * car, std::vector<cv::Rect> bbs)
+{
+	cv::Rect carbb = car->getBB();
+	std::vector<cv::Rect> over = getOverlapping(carbb, bbs);
+	if (car->isDirectionSet()) {
+		return getBestClose(carbb, over, car->goesUp());
+	}
+	else {
+		return getClosest(carbb, over,DistanceTypes::Normal);
+	}
+}
+
+cv::Rect ObjectTracker::getBestClose(cv::Rect carbb, std::vector<cv::Rect> overlapping, bool goingUp)
+{
+	if (goingUp)
+		return getClosest(carbb, overlapping, DistanceTypes::FavouringUp);
+	else
+		return getClosest(carbb, overlapping, DistanceTypes::FavouringDown);
+}
+
+
+
+
+
+std::vector<cv::Rect> ObjectTracker::getActiveWhiteCars()
+{
+	std::vector<cv::Rect> whiteActiveCars;
+	for (Car* car : cars) {
+		if (car->isColorSet() && car->isWhite() && !car->exited()) 
+			whiteActiveCars.push_back(car->getBB());
+	}
+	return whiteActiveCars;
+}
+
+int ObjectTracker::getWhiteCarsCount()
+{
+	int whiteCars = 0;
+	for (Car* car : cars) {
+		if (car->isColorSet() && car->isWhite()) whiteCars++;
+	}
+	return whiteCars;
 }

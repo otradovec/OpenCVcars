@@ -1,6 +1,12 @@
 #include "ColorTracker.h"
 
+ColorTracker::ColorTracker()
+{
+}
 
+ColorTracker::~ColorTracker()
+{
+}
 
 cv::Mat ColorTracker::preprocessImage(cv::Mat image)
 {
@@ -21,14 +27,6 @@ cv::Mat ColorTracker::preprocessImage(cv::Mat image)
 	cv::erode(preprocessedImage, preprocessedImage, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)));
 	cv::dilate(preprocessedImage, preprocessedImage, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(6, 6)));
 	return preprocessedImage;
-}
-
-ColorTracker::ColorTracker()
-{
-}
-
-ColorTracker::~ColorTracker()
-{
 }
 
 cv::Point ColorTracker::getColorPosition(cv::Mat image)
@@ -62,4 +60,30 @@ cv::Point ColorTracker::getColorPosition(cv::Mat image)
 	cv::drawContours(image, contours, -1, (0, 255, 0), 3);
 
 	return position;
+}
+
+bool ColorTracker::isWhiteCar(cv::Mat cut)
+{
+	cv::Mat preprocessedImage = preprocessImage(cut);
+	std::cout << "Area size: " + std::to_string(getGreatestArea(preprocessedImage));
+	return getGreatestArea(preprocessedImage) > 800;
+}
+
+double ColorTracker::getGreatestArea(cv::Mat blackAndWhiteImage)
+{
+	std::vector<std::vector<cv::Point>> contours;
+	///param hierarchy is for hierarchy what is inside of other
+	std::vector<cv::Vec4i> hierarchy;
+	cv::findContours(blackAndWhiteImage, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0.0));
+	double largestArea = 0;
+	for (int i = 0; i < contours.size(); i++)
+	{
+		double area = cv::contourArea(contours.at(i));
+		if (area > largestArea)
+		{
+			largestArea = area;
+		}
+	}
+	cv::drawContours(blackAndWhiteImage, contours, -1, (0, 255, 0), 3);
+	return largestArea;
 }

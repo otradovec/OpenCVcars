@@ -10,7 +10,7 @@ Car::Car(cv::Rect bb)
 	m_directionSet = false;
 	m_goesUp = false;
 	m_exited = false;
-	std::cout << "Created car id: " + m_id;
+	std::cout << std::endl << "Created car id: " + m_id;
 }
 
 Car::~Car()
@@ -31,7 +31,7 @@ bool Car::isWhite()
 {
 	if (!m_colorSetted)
 	{
-		throw "Getting not processed color";
+		throw std::logic_error("Getting not processed color");
 	}
 	return m_isWhite;
 }
@@ -45,7 +45,7 @@ bool Car::goesUp()
 {
 	if (!m_directionSet)
 	{
-		throw "Getting not processed direction";
+		throw std::logic_error("Getting not processed direction");
 	}
 	return m_goesUp;
 }
@@ -62,7 +62,7 @@ long Car::getId()
 
 void Car::setBB(cv::Rect lastBB)
 {
-	if (lastBB.area() < 1) throw "Setting bb without area";
+	if (lastBB.area() < 1) throw std::invalid_argument("Setting bb without area");
 	m_lastBB = lastBB;
 }
 
@@ -70,7 +70,7 @@ void Car::setWhite(bool isWhite)
 {
 	if (m_colorSetted)
 	{
-		throw "Setting color that was already processed";
+		throw std::logic_error("Setting color that was already processed");
 	}
 	m_isWhite = isWhite;
 	m_colorSetted = true;
@@ -79,7 +79,7 @@ void Car::setWhite(bool isWhite)
 void Car::setGoesUp(bool goesUp)
 {
 	if (m_directionSet) {
-		throw "Setting direction, but was already setted.";
+		throw std::logic_error("Setting direction, but was already setted.");
 	}
 	m_goesUp = goesUp;
 	m_directionSet = true;
@@ -87,6 +87,6 @@ void Car::setGoesUp(bool goesUp)
 
 void Car::setExited(bool exited)
 {
-	if (m_exited && !exited) throw "Car comeback";
+	if (m_exited && !exited) throw std::logic_error("Car comeback");
 	m_exited = exited;
 }
