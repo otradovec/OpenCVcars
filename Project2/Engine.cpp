@@ -49,6 +49,7 @@ void Engine::run()
 		
 		captureCameraFrame();
 		captureCameraFrame();
+		captureCameraFrame();
 		if (c == 115) skip(20);
 		c = cv::waitKey(1);
 	}

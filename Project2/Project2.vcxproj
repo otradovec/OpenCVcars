@@ -164,10 +164,6 @@
     <ClInclude Include="FrameHistory.h" />
     <ClInclude Include="ObjectIsolator.h" />
     <ClInclude Include="ObjectTracker.h" />
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Project2.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

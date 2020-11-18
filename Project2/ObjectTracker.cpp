@@ -254,7 +254,7 @@ bool ObjectTracker::equalsBBs(cv::Rect first, cv::Rect second)
 
 cv::Point ObjectTracker::getCenter(cv::Rect rect)
 {
-	return cv::Point((rect.x + rect.width) / 2, (rect.y + rect.height) / 2);
+	return cv::Point((2*rect.x + rect.width) / 2, (2*rect.y + rect.height) / 2);
 }
 
 double ObjectTracker::getDistance(cv::Point first, cv::Point second)
