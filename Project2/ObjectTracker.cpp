@@ -1,17 +1,19 @@
 #include "ObjectTracker.h"
 
-ObjectTracker::ObjectTracker()
+ObjectTracker::ObjectTracker(int fps)
 {
 	currentBBs = std::vector<cv::Rect>();
 	previousBBs = std::vector<cv::Rect>();
 	subpreviousBBs = std::vector<cv::Rect>();
 	colorTracker = new ColorTracker();
+	speedTracker = new SpeedTracker(fps);
 }
 
 ObjectTracker::~ObjectTracker()
 {
 	for (Car* car : cars) { delete car; }
 	delete colorTracker;
+	delete speedTracker;
 }
 
 std::vector<cv::Point2f> ObjectTracker::getExceptionalPoints(cv::Mat image)
@@ -97,8 +99,8 @@ void ObjectTracker::updateCar(Car* car, FrameHistory* frameHistory)
 		{
 			updateBB(car);
 			updateColor(car,frameHistory);
+			speedTracker->updateSpeed(car);
 			updateDirection(car);
-			//updateSpeed(car);
 		}
 	}
 }
@@ -109,9 +111,7 @@ void ObjectTracker::updateColor(Car * car, FrameHistory* frameHistory)
 		cv::Mat current = frameHistory->getCurrent();
 		if (current.empty()) throw new std::runtime_error("Empty image");
 		cv::Mat imageCut = getImageCut(car->getBB(), current);
-		car->print();
 		car->setWhite(colorTracker->isWhiteCar(imageCut));
-		car->print();
 	}
 }
 

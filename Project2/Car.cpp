@@ -10,6 +10,7 @@ Car::Car(cv::Rect bb)
 	m_directionSet = false;
 	m_goesUp = false;
 	m_exited = false;
+	m_speed = 0;
 	std::cout << std::endl << " Created car id: " + std::to_string(m_id);
 }
 
@@ -20,6 +21,11 @@ Car::~Car()
 cv::Rect Car::getBB()
 {
 	return m_lastBB;
+}
+
+cv::Rect Car::getprevBB()
+{
+	return m_prevBB;
 }
 
 bool Car::isColorSet()
@@ -60,9 +66,15 @@ long Car::getId()
 	return m_id;
 }
 
+double Car::getSpeed()
+{
+	return m_speed;
+}
+
 void Car::setBB(cv::Rect lastBB)
 {
 	if (lastBB.area() < 1) throw std::invalid_argument("Setting bb without area");
+	m_prevBB = m_lastBB;
 	m_lastBB = lastBB;
 }
 
@@ -91,10 +103,16 @@ void Car::setExited(bool exited)
 	m_exited = exited;
 }
 
+void Car::setSpeed(double speed)
+{
+	if (m_speed > 0.0) throw new std::logic_error("Speed already set.");
+	m_speed = speed;
+}
+
 void Car::print()
 {
 	cout << "Car id: " + to_string(this->m_id)
 		+ ", isDirectionSet: " + to_string(this->m_directionSet) + ", goes up: " + to_string(this->m_goesUp)
 		+ ", is color set: " + to_string(this->m_colorSetted) + ", is white: " + to_string(this->m_isWhite)
-		+ "BB top left: " + to_string(this->m_lastBB.x) << std::endl;
+		+ "Speed: " + to_string(this->m_speed) << std::endl;
 }

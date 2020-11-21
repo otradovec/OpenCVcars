@@ -1,6 +1,5 @@
 #include "Engine.h"
 
-//Celkovy pocet bilych aut.
 //Prumerna rychlost automobilu.
 
 Engine::Engine()
@@ -12,11 +11,16 @@ Engine::Engine()
 	std::cout << "Checkpoint1";
 	windowSize = cv::Size(640, 480);
 	history = nullptr;
+	double fpsD = 25 / (1 + skipped);
+	int fps = std::round(fpsD);
+	objectTracker = new ObjectTracker(fps);
+
 }
 
 Engine::~Engine()
 {
 	if (history != nullptr) delete history;
+	delete objectTracker;
 }
 
 void Engine::run()
@@ -24,8 +28,6 @@ void Engine::run()
 	captureCameraFrame();
 	char c = cv::waitKey(1);
 	while(c != 27 && !cameraFrame.empty()) {
-		
-
 		float cropH = 0.6F;
 		cv::Rect myROI(0, windowSize.height*cropH, windowSize.width, windowSize.height*(1-cropH));
 		cv::Mat cropped = cameraFrame(myROI);
@@ -34,20 +36,20 @@ void Engine::run()
 		cv::Mat activeCars;
 		cropped.copyTo(activeCars);
 		cv::Scalar blueColor = cv::Scalar(255, 0, 0);
-		objectTracker.trackBB(obj, history);
+		objectTracker->trackBB(obj, history);
 		cv::Scalar whiteColor = cv::Scalar(255, 255, 255);
-		std::vector<cv::Rect> whiteActiveCars = objectTracker.getActiveWhiteCars();
+		std::vector<cv::Rect> whiteActiveCars = objectTracker->getActiveWhiteCars();
 		drawBB(obj, cropped, blueColor);
 		drawBB(whiteActiveCars, cropped, whiteColor);
-		std::cout << " Active cars: " + std::to_string(objectTracker.getBBsOfActiveCars().size());
-		drawBB(objectTracker.getBBsOfActiveCars(), activeCars,blueColor);
+		std::cout << " Active cars: " + std::to_string(objectTracker->getBBsOfActiveCars().size());
+		drawBB(objectTracker->getBBsOfActiveCars(), activeCars,blueColor);
 		cv::imshow("Active cars", activeCars);
-		std::string textString = std::string("Pionyrska: ") + std::to_string(objectTracker.getCarsGoingDown()) +
-			" Lesnicka: " + std::to_string(objectTracker.getCarsGoingUp())  + " Bila: " + std::to_string(objectTracker.getWhiteCarsCount());
+		std::string textString = std::string("Pionyrska: ") + std::to_string(objectTracker->getCarsGoingDown()) +
+			" Lesnicka: " + std::to_string(objectTracker->getCarsGoingUp())  + " Bila: " + std::to_string(objectTracker->getWhiteCarsCount());
 		cv::putText(cameraFrame,textString, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(118, 185, 0), 2);
 		cv::imshow("Camera stream", cameraFrame);
 		
-		captureCameraFrame();
+		skip(skipped);
 		captureCameraFrame();
 		if (c == 115) skip(20);
 		c = cv::waitKey(1);

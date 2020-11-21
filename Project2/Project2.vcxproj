@@ -156,6 +156,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectIsolator.cpp" />
     <ClCompile Include="ObjectTracker.cpp" />
+    <ClCompile Include="SpeedTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="FrameHistory.h" />
     <ClInclude Include="ObjectIsolator.h" />
     <ClInclude Include="ObjectTracker.h" />
+    <ClInclude Include="SpeedTracker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

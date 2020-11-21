@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include "Car.h"
 #include "ColorTracker.h"
+#include "SpeedTracker.h"
 
 enum DistanceTypes{Normal,FavouringUp,FavouringDown};
 
@@ -15,8 +16,9 @@ private:
 	std::vector<cv::Rect> currentBBs;
 	std::vector<Car*> cars;
 	ColorTracker* colorTracker;
+	SpeedTracker* speedTracker;
 public:
-	ObjectTracker();
+	ObjectTracker(int fps);
 	~ObjectTracker();
 	std::vector<cv::Point2f> getExceptionalPoints(cv::Mat image);
 	std::vector<cv::Point2f> trackObject(cv::Mat oldImage, cv::Mat currentImage, std::vector<cv::Point2f> oldPoints);
