@@ -42,7 +42,7 @@ void Engine::run()
 		drawBB(whiteActiveCars, cropped, whiteColor);
 		std::cout << " Active cars: " + std::to_string(objectTracker->getBBsOfActiveCars().size());
 		drawBB(objectTracker->getBBsOfActiveCars(), activeCars,blueColor);
-		cv::imshow("Active cars", activeCars);
+		//cv::imshow("Active cars", activeCars);
 		
 		showResult();
 		skip(skipped);

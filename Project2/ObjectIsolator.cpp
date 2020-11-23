@@ -15,27 +15,26 @@ std::vector<cv::Rect> ObjectIsolator::getObjects(cv::Mat image)
 	int	max_binary_value = 255;
 	int tresholdType = 0;
 	cv::threshold(image, image, threshold_value, max_binary_value, tresholdType);
-	//cv::imshow("before erosion", image);
+
 	int erosion_size = 2;
 	cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
 		cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1));
 	cv::erode(image, image, element);
 	int dilateSize = 3;
-	//cv::imshow("before dilate", image);
+
 	cv::Mat dilElement = cv::getStructuringElement(cv::MORPH_ELLIPSE,
 		cv::Size(2 * dilateSize + 1, 2 * dilateSize + 1));
 	cv::dilate(image, image, dilElement);
-	//cv::imshow("before erosion 2", image);
+
 	erosion_size = 9;
 	element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
 		cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1));
 	cv::erode(image, image, element);
 	dilateSize = 15;
-	//cv::imshow("before dilate 2", image);
+
 	dilElement = cv::getStructuringElement(cv::MORPH_ELLIPSE,
 		cv::Size(2 * dilateSize + 1, 2 * dilateSize + 1));
 	cv::dilate(image, image, dilElement);
-	cv::imshow("after dilate 2", image);
 
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
