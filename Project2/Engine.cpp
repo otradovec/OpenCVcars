@@ -14,7 +14,6 @@ Engine::Engine()
 	double fpsD = 25 / (1 + skipped);
 	int fps = std::round(fpsD);
 	objectTracker = new ObjectTracker(fps);
-
 }
 
 Engine::~Engine()
@@ -100,12 +99,12 @@ void Engine::skip(int howManyFrames)
 void Engine::showResult()
 {
 	std::vector<std::string> lines = std::vector<std::string>();
-	cv::Scalar textColor = cv::Scalar(0, 0, 0);
+	cv::Scalar textColor = cv::Scalar(0, 204, 255);
 	lines.push_back(std::string("Rychlost: ") + std::to_string(objectTracker->getAverageSpeed()).substr(0, 5) + " km/h");
 	lines.push_back(std::string("Lesnicka: ") + std::to_string(objectTracker->getCarsGoingUp()));
 	lines.push_back(std::string("Pionyrska: ") + std::to_string(objectTracker->getCarsGoingDown()));
 	lines.push_back("Bila: " + std::to_string(objectTracker->getWhiteCarsCount()));
-	putLines(cameraFrame, lines, cv::Point(10, 10), cv::FONT_HERSHEY_DUPLEX, 1.0, textColor, 2);
+	putLines(cameraFrame, lines, cv::Point(10, 30), cv::FONT_HERSHEY_DUPLEX, 1.0, textColor, 2);
 	cv::imshow("Camera frame with isolation of objects", cameraFrame);
 }
 
@@ -113,7 +112,6 @@ void Engine::putLines(cv::Mat frame, std::vector<std::string> lines, cv::Point s
 {
 	for (int i = 0; i < lines.size(); i++) {
 		std::string line = lines.at(i);
-		std::cout << std::endl << "Putting line " + line << std::endl ;
 		cv::putText(frame, line, cv::Point(start.x,start.y + i*30), fontFace, fontScale, color, thickness);
 	}
 }
