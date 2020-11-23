@@ -26,5 +26,7 @@ private:
 	void drawBB(std::vector<cv::Rect> obj, cv::Mat image, cv::Scalar color);
 	void createOrUpdateHistory(cv::Mat currentImage);
 	void skip(int howManyFrames);
+	void showResult();
+	void putLines(cv::Mat frame, std::vector<std::string> lines, cv::Point start, int fontFace, double fontScale, cv::Scalar color, int thickness);
 };
 

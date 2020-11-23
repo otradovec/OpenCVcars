@@ -94,6 +94,7 @@ void ObjectTracker::updateCar(Car* car, FrameHistory* frameHistory)
 		{
 			car->setExited(true);
 			std::cout << " Exited car: " + std::to_string(car->getId()) << std::endl;
+			car->print();
 		}
 		else
 		{
@@ -296,6 +297,11 @@ std::vector<cv::Rect> ObjectTracker::getActiveWhiteCars()
 			whiteActiveCars.push_back(car->getBB());
 	}
 	return whiteActiveCars;
+}
+
+double ObjectTracker::getAverageSpeed()
+{
+	return speedTracker->getAverageSpeed(cars);
 }
 
 int ObjectTracker::getWhiteCarsCount()

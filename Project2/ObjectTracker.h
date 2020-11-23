@@ -29,6 +29,7 @@ public:
 	std::vector<cv::Rect> getBBsOfActiveCars();
 	int getWhiteCarsCount();
 	std::vector<cv::Rect> getActiveWhiteCars();
+	double getAverageSpeed();
 private:
 	void updateBBs(std::vector < cv::Rect> newBoxes);
 	void updateCars(FrameHistory* frameHistory);

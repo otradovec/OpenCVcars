@@ -24,6 +24,26 @@ void SpeedTracker::updateSpeed(Car * car)
 	}
 }
 
+double SpeedTracker::getAverageSpeed(std::vector<Car*> cars)
+{
+	double sum = 0;
+	int count = 0;
+	for (Car* car : cars) {
+		double speed = car->getSpeed();
+		if (speed > 0.0) {
+			sum = +speed;
+			count++;
+			//std::cout << std::endl << car->getSpeed();
+		}
+			
+	}
+	//std::cout << std::endl << count;
+	if (count > 0)
+		return sum / count;
+	else
+		return 0.0;
+}
+
 void SpeedTracker::setSpeed(Car * car, double speed)
 {
 	car->setSpeed(speed);
@@ -44,5 +64,10 @@ double SpeedTracker::calculateSpeed(Car * car)
 
 double SpeedTracker::getSpeed(int speedInPx)
 {
-	return ((double)speedInPx /m_pxInCrop) * m_realCropLengthInMetres * m_fps;
+	return 3.6 * getSpeedMps(speedInPx);
+}
+
+double SpeedTracker::getSpeedMps(int speedInPx)
+{
+	return ((double)speedInPx / m_pxInCrop) * m_realCropLengthInMetres * m_fps;
 }
