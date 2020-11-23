@@ -1,7 +1,5 @@
 #include "Engine.h"
 
-//Prumerna rychlost automobilu.
-
 Engine::Engine()
 {
 	videoCapture = cv::VideoCapture("C:\\src\\video.mp4");
@@ -32,17 +30,13 @@ void Engine::run()
 		cv::Mat cropped = cameraFrame(myROI);
 		createOrUpdateHistory(cropped);
 		std::vector<cv::Rect> obj = objectIsolator.getObjects(cropped);
-		cv::Mat activeCars;
-		cropped.copyTo(activeCars);
 		cv::Scalar blueColor = cv::Scalar(255, 0, 0);
-		objectTracker->trackBB(obj, history);
 		cv::Scalar whiteColor = cv::Scalar(255, 255, 255);
+		objectTracker->trackBB(obj, history);
 		std::vector<cv::Rect> whiteActiveCars = objectTracker->getActiveWhiteCars();
 		drawBB(obj, cropped, blueColor);
 		drawBB(whiteActiveCars, cropped, whiteColor);
 		std::cout << " Active cars: " + std::to_string(objectTracker->getBBsOfActiveCars().size());
-		drawBB(objectTracker->getBBsOfActiveCars(), activeCars,blueColor);
-		//cv::imshow("Active cars", activeCars);
 		
 		showResult();
 		skip(skipped);
